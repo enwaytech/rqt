@@ -2,6 +2,11 @@
 Changelog for package rqt_py_common
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Use an rclpy context manager. (`#312 <https://github.com/ros-visualization/rqt/issues/312>`_)
+* Contributors: Chris Lalancette
+
 1.7.2 (2024-07-23)
 ------------------
 
