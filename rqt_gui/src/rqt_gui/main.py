@@ -51,8 +51,6 @@ class Main(Base):
         if argv is None:
             argv = sys.argv
 
-        # ignore ROS specific remapping arguments
-        argv = rclpy.utilities.remove_ros_args(args=argv)
         help_text = """<p><b>rqt</b> is a GUI framework that is able to load various plug-in tools
 as dockable windows. There are currently no plug-ins selected. To add plug-ins, select items from
 the <b>Plugins</b> menu.</p>
