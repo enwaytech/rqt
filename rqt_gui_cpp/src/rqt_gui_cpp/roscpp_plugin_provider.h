@@ -36,6 +36,7 @@
 #include <qt_gui_cpp/composite_plugin_provider.h>
 
 #include <QMessageBox>
+#include <QStringList>
 #include <QThread>
 
 #include <string>
@@ -58,7 +59,8 @@ public:
 
 protected:
 
-  void init_rclcpp();
+  void init_rclcpp(const QStringList& args);
+  void init_rclcpp(int argc, char** argv);
 
   bool rclcpp_initialized_;
 

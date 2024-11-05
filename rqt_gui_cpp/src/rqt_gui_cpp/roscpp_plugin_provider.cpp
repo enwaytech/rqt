@@ -38,9 +38,12 @@
 #include <qt_gui_cpp/plugin_provider.h>
 #include <rclcpp/rclcpp.hpp>
 
+#include <QCoreApplication>
+
 #include <pluginlib/class_list_macros.hpp>
 
 #include <stdexcept>
+#include <string.h>
 #include <sys/types.h>
 
 namespace rqt_gui_cpp {
@@ -53,8 +56,7 @@ RosCppPluginProvider::RosCppPluginProvider()
   {
     rclcpp_initialized_ = true;
   }
-
-  init_rclcpp();
+  init_rclcpp(QCoreApplication::arguments());
   QList<PluginProvider*> plugin_providers;
   plugin_providers.append(new NodeletPluginProvider("rqt_gui", "rqt_gui_cpp::Plugin"));
   set_plugin_providers(plugin_providers);
@@ -71,31 +73,43 @@ RosCppPluginProvider::~RosCppPluginProvider()
 void* RosCppPluginProvider::load(const QString& plugin_id, qt_gui_cpp::PluginContext* plugin_context)
 {
   qDebug("RosCppPluginProvider::load(%s)", plugin_id.toStdString().c_str());
-  init_rclcpp();
+  init_rclcpp(plugin_context->argv());
   return qt_gui_cpp::CompositePluginProvider::load(plugin_id, plugin_context);
 }
 
 qt_gui_cpp::Plugin* RosCppPluginProvider::load_plugin(const QString& plugin_id, qt_gui_cpp::PluginContext* plugin_context)
 {
   qDebug("RosCppPluginProvider::load_plugin(%s)", plugin_id.toStdString().c_str());
-  init_rclcpp();
+  init_rclcpp(plugin_context->argv());
   return qt_gui_cpp::CompositePluginProvider::load_plugin(plugin_id, plugin_context);
 }
 
-void RosCppPluginProvider::init_rclcpp()
+void RosCppPluginProvider::init_rclcpp(const QStringList& args)
+{
+  // convert plugin_context.argv() from a QStringList to a char**
+  int argc = args.size();
+  char** argv = new char*[argc];
+  for (int i = 0; i < argc; i++)
+  {
+    argv[i] = strdup(args.at(i).toStdString().c_str());
+  }
+
+  init_rclcpp(argc, argv);
+
+  for (int i = 0; i < argc; i++)
+  {
+    free(argv[i]);
+  }
+}
+void RosCppPluginProvider::init_rclcpp(int argc, char** argv)
 {
   // initialize ROS node once
   if (!rclcpp_initialized_)
   {
-    int argc = 0;
-    char** argv = 0;
-
     // Initialize any global resources needed by the middleware and the client library.
-    // This will also parse command line arguments one day (as of Beta 1 they are not used).
     // You must call this before using any other part of the ROS system.
     // This should be called once per process.
     rclcpp::init(argc, argv);
-
 
     // Don't do this again in this process
     rclcpp_initialized_ = true;
