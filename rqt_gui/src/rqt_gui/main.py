@@ -33,7 +33,6 @@ import sys
 
 from qt_gui.main import Main as Base
 from qt_gui.ros_package_helper import get_package_path
-import rclpy
 
 
 class Main(Base):
